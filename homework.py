@@ -59,19 +59,27 @@ def send_message(message):
 
 
 def main():
-    current_timestamp = int(time.time())  # Начальное значение timestamp
+    import datetime as dt
+    datetime = dt.datetime(2021, 6, 20)
+    current_timestamp = int(dt.datetime.timestamp(datetime))  # Начальное значение timestamp
     status_after = None
     while True:
         try:
-            # получим последнюю домашку
-            homework = get_homeworks(current_timestamp)["homeworks"][0]
-            status_before = homework["status"]
-            # если статус домашки изменился, то отправляем сообщение
-            if status_before != status_after:
-                message = parse_homework_status(homework)
-                send_message(message)
-                status_after = status_before
-            time.sleep(5 * 60)  # Опрашивать раз в пять минут
+            # получим домашки
+            homeworks = get_homeworks(current_timestamp)["homeworks"]
+            # проверяем наличие домашек
+            if len(homeworks) > 0:
+                # получим последнюю домашку
+                homework = homeworks[0]
+                status_before = homework["status"]
+                # если статус домашки изменился, то отправляем сообщение
+                if status_before != status_after:
+                    message = parse_homework_status(homework)
+                    send_message(message)
+                    status_after = status_before
+                time.sleep(5 * 60)  # Опрашивать раз в пять минут
+            else:
+                continue
         except Exception as e:
             logging.error(e, exc_info=True)
             message = f'Бот упал с ошибкой: {e}'
