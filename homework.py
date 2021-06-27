@@ -9,18 +9,18 @@ from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s, %(levelname)s, %(name)s, %(message)s",
-                    filename="api_sp1_bot/main.log",
+                    filename="main.log",
                     filemode="a")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-handler_steam = logging.StreamHandler()
-handler_steam.setLevel(logging.DEBUG)
-handler_rotate = RotatingFileHandler("api_sp1_bot/main.log",
+handler_rotate = RotatingFileHandler("main.log",
                                      maxBytes=50000,
                                      backupCount=3)
-logger.addHandler(handler_steam)
+handler_steam = logging.StreamHandler()
+
 logger.addHandler(handler_rotate)
+logger.addHandler(handler_steam)
 
 
 load_dotenv()
@@ -42,7 +42,7 @@ def parse_homework_status(homework):
         verdict = "Работа принята на ревью."
     else:
         verdict = "Ревьюеру всё понравилось, работа зачтена!"
-    return f"У вас проверили работу '{homework_name}'!\n\n{verdict}"
+    return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
 def get_homeworks(current_timestamp):
@@ -59,7 +59,7 @@ def send_message(message):
 
 
 def main():
-    current_timestamp = 0  # int(time.time())  # Начальное значение timestamp
+    current_timestamp = int(time.time())  # Начальное значение timestamp
     status_after = None
     while True:
         try:
