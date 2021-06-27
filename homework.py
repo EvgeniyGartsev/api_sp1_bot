@@ -59,9 +59,7 @@ def send_message(message):
 
 
 def main():
-    import datetime as dt
-    datetime = dt.datetime(2021, 6, 20)
-    current_timestamp = int(dt.datetime.timestamp(datetime))  # Начальное значение timestamp
+    current_timestamp = int(time.time())  # Начальное значение timestamp
     status_after = None
     while True:
         try:
