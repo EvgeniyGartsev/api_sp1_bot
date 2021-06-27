@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 venv
 main.log
-Procfile
 
 
 # C extensions
