@@ -1,9 +1,10 @@
+import logging
 import os
 import time
+from logging.handlers import RotatingFileHandler
+
 import requests
 import telegram
-import logging
-from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 
 
@@ -26,6 +27,7 @@ logger.addHandler(handler_steam)
 load_dotenv()
 
 
+URL = "https://praktikum.yandex.ru/"
 PRAKTIKUM_TOKEN = os.getenv('PRAKTIKUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
@@ -35,6 +37,16 @@ bot = telegram.Bot(token=TELEGRAM_TOKEN)
 
 
 def parse_homework_status(homework):
+    homework_keys = ["homework_name", "status"]
+    homework_status = ["rejected", "reviewing", "approved"]
+    # проверяем наличие ключей
+    exists_keys = all(element in homework for element in homework_keys)
+    if exists_keys:
+        exists_status = homework["status"] in homework_status
+        if not exists_status:
+            return "Неверный ответ сервера"
+    else:
+        return "Неверный ответ сервера"
     homework_name = homework["homework_name"]
     if homework["status"] == "rejected":
         verdict = "К сожалению, в работе нашлись ошибки."
@@ -47,10 +59,18 @@ def parse_homework_status(homework):
 
 def get_homeworks(current_timestamp):
     '''Get all homeworks'''
-    url = "https://praktikum.yandex.ru/api/user_api/homework_statuses/"
-    headers = {"Authorization": f"OAuth {PRAKTIKUM_TOKEN}"}
-    payload = {"from_date": current_timestamp}
-    homework_statuses = requests.get(url, headers=headers, params=payload)
+    try:
+        url_add = "api/user_api/homework_statuses/"
+        url = URL + url_add
+        headers = {"Authorization": f"OAuth {PRAKTIKUM_TOKEN}"}
+        payload = {"from_date": current_timestamp}
+        homework_statuses = requests.get(url,
+                                         headers=headers,
+                                         params=payload,
+                                         timeout=5)
+        homework_statuses.raise_for_status()
+    except Exception as e:
+        logging.error(e, exc_info=True)
     return homework_statuses.json()
 
 
