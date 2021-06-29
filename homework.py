@@ -27,10 +27,10 @@ logger.addHandler(handler_steam)
 load_dotenv()
 
 
-URL = "https://praktikum.yandex.ru/"
-PRAKTIKUM_TOKEN = os.getenv('PRAKTIKUM_TOKEN')
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+URL: str = "https://praktikum.yandex.ru/"
+PRAKTIKUM_TOKEN: str = os.getenv('PRAKTIKUM_TOKEN')
+TELEGRAM_TOKEN: str = os.getenv('TELEGRAM_TOKEN')
+CHAT_ID: int = os.getenv('TELEGRAM_CHAT_ID')
 
 # инициализация бота
 bot = telegram.Bot(token=TELEGRAM_TOKEN)
