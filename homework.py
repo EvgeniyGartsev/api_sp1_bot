@@ -2,6 +2,7 @@ import logging
 import os
 import time
 from logging.handlers import RotatingFileHandler
+from typing import Dict, List, Optional
 
 import requests
 import telegram
@@ -37,17 +38,17 @@ bot = telegram.Bot(token=TELEGRAM_TOKEN)
 
 
 def parse_homework_status(homework):
-    homework_keys = ["homework_name", "status"]
-    homework_status = ["rejected", "reviewing", "approved"]
+    homework_keys: List[str] = ["homework_name", "status"]
+    homework_status: List[str] = ["rejected", "reviewing", "approved"]
     # проверяем наличие ключей
-    exists_keys = all(element in homework for element in homework_keys)
+    exists_keys: bool = all(element in homework for element in homework_keys)
     if exists_keys:
-        exists_status = homework["status"] in homework_status
+        exists_status: bool = homework["status"] in homework_status
         if not exists_status:
             return "Неверный ответ сервера"
     else:
         return "Неверный ответ сервера"
-    homework_name = homework["homework_name"]
+    homework_name: str = homework["homework_name"]
     if homework["status"] == "rejected":
         verdict = "К сожалению, в работе нашлись ошибки."
     elif homework["status"] == "reviewing":
@@ -60,10 +61,10 @@ def parse_homework_status(homework):
 def get_homeworks(current_timestamp):
     '''Get all homeworks'''
     try:
-        url_add = "api/user_api/homework_statuses/"
-        url = URL + url_add
-        headers = {"Authorization": f"OAuth {PRAKTIKUM_TOKEN}"}
-        payload = {"from_date": current_timestamp}
+        url_add: str = "api/user_api/homework_statuses/"
+        url: str = URL + url_add
+        headers: str = {"Authorization": f"OAuth {PRAKTIKUM_TOKEN}"}
+        payload: Dict[str, int] = {"from_date": current_timestamp}
         homework_statuses = requests.get(url,
                                          headers=headers,
                                          params=payload,
@@ -79,20 +80,20 @@ def send_message(message):
 
 
 def main():
-    current_timestamp = int(time.time())  # Начальное значение timestamp
-    status_after = None
+    current_timestamp: int = int(time.time())  # Начальное значение timestamp
+    status_after: Optional[str] = None
     while True:
         try:
             # получим домашки
-            homeworks = get_homeworks(current_timestamp)["homeworks"]
+            homeworks: List = get_homeworks(current_timestamp)["homeworks"]
             # проверяем наличие домашек
             if len(homeworks) > 0:
                 # получим последнюю домашку
-                homework = homeworks[0]
-                status_before = homework["status"]
+                homework: Dict = homeworks[0]
+                status_before: str = homework["status"]
                 # если статус домашки изменился, то отправляем сообщение
                 if status_before != status_after:
-                    message = parse_homework_status(homework)
+                    message: str = parse_homework_status(homework)
                     send_message(message)
                     status_after = status_before
                 time.sleep(5 * 60)  # Опрашивать раз в пять минут
@@ -100,7 +101,7 @@ def main():
                 continue
         except Exception as e:
             logging.error(e, exc_info=True)
-            message = f'Бот упал с ошибкой: {e}'
+            message: str = f'Бот упал с ошибкой: {e}'
             send_message(message)
             time.sleep(5)
 
