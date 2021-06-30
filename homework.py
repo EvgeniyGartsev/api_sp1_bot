@@ -68,12 +68,10 @@ def get_homeworks(current_timestamp):
         homework_statuses = requests.get(url,
                                          headers=headers,
                                          params=payload,
-                                         timeout=5)
+                                         timeout=60)
         homework_statuses.raise_for_status()
     except Exception as e:
         logging.error(e, exc_info=True)
-        empty = {}
-        return empty
     return homework_statuses.json()
 
 
