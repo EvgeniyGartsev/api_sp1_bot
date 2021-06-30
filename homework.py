@@ -60,11 +60,11 @@ def parse_homework_status(homework):
 
 def get_homeworks(current_timestamp):
     '''Get all homeworks'''
+    url_add: str = "api/user_api/homework_statuses/"
+    url: str = URL + url_add
+    headers: str = {"Authorization": f"OAuth {PRAKTIKUM_TOKEN}"}
+    payload: Dict[str, int] = {"from_date": current_timestamp}
     try:
-        url_add: str = "api/user_api/homework_statuses/"
-        url: str = URL + url_add
-        headers: str = {"Authorization": f"OAuth {PRAKTIKUM_TOKEN}"}
-        payload: Dict[str, int] = {"from_date": current_timestamp}
         homework_statuses = requests.get(url,
                                          headers=headers,
                                          params=payload,
@@ -72,6 +72,8 @@ def get_homeworks(current_timestamp):
         homework_statuses.raise_for_status()
     except Exception as e:
         logging.error(e, exc_info=True)
+        empty = {}
+        return empty
     return homework_statuses.json()
 
 
