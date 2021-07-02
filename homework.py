@@ -5,6 +5,7 @@ from logging.handlers import RotatingFileHandler
 from typing import Dict, List, Optional
 
 import requests
+from requests.exceptions import RequestException
 from requests.models import HTTPError
 import telegram
 from dotenv import load_dotenv
@@ -70,9 +71,13 @@ def get_homeworks(current_timestamp):
                                          headers=headers,
                                          params=payload,
                                          timeout=60)
-        if homework_statuses.status_code != 200:
-            raise HTTPError
-    except Exception as e:
+        if 400 <= homework_statuses.status_code < 500:
+            raise HTTPError("Client error, request status = "
+                            f"{homework_statuses.status_code}")
+        elif 500 <= homework_statuses.status_code < 600:
+            raise HTTPError("Server error, request status = "
+                            f"{homework_statuses.status_code}")
+    except RequestException as e:
         logging.error(e, exc_info=True)
         return {}
     return homework_statuses.json()
