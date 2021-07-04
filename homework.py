@@ -90,10 +90,18 @@ def send_message(message):
 def main():
     current_timestamp: int = int(time.time())  # Начальное значение timestamp
     status_after: Optional[str] = None
+    homeworks_key = ["homeworks"]
     while True:
         try:
-            # получим домашки
-            homeworks: List = get_homeworks(current_timestamp)["homeworks"]
+            # проверим что есть ключ homeworks
+            homeworks_check = get_homeworks(current_timestamp)
+            is_homeworks_key = any(element in homeworks_key
+                                   for element in homeworks_check)
+            if is_homeworks_key:
+                # получим домашки
+                homeworks: List = homeworks_check["homeworks"]
+            else:
+                continue
             # проверяем наличие домашек
             if len(homeworks) > 0:
                 # получим последнюю домашку
